@@ -10,7 +10,7 @@ fi
 # Standard go tooling behavior is to ignore dirs with leading underscors
 for dir in $(find . -maxdepth 10 -not -path './cmd/*' -not -path './.git*' -not -path '*/_*' -type d); do
   if ls $dir/*.go &> /dev/null; then
-    go test -v -coverprofile=profile.out $dir -check.v || fail=1
+    go test -v -coverprofile=profile.out $dir || fail=1
     if [ -f profile.out ]; then
       cat profile.out | grep -v "mode: set" >> acc.out
       rm profile.out
