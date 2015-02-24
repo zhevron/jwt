@@ -1,7 +1,14 @@
 // Package jwt provides an implementation JSON Web Tokens.
 package jwt
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/zhevron/jwt/hmac"
+)
+
+// Signer is used by the signing packages to sign tokens.
+type Signer func(string, []byte) []byte
 
 // Type is used to define the type of token.
 type Type string
@@ -84,11 +91,11 @@ var supportedTypes = map[Type]bool{
 }
 
 // supportedAlgorithms is used to determine if an algorithm is supported.
-var supportedAlgorithms = map[Algorithm]bool{
-	None:  true,
-	HS256: true,
-	HS384: true,
-	HS512: true,
+var supportedAlgorithms = map[Algorithm]Signer{
+	None:  nil,
+	HS256: hmac.HS256,
+	HS384: hmac.HS384,
+	HS512: hmac.HS512,
 }
 
 // reservedClaims is used to make sure no reserved claims are used in user data.

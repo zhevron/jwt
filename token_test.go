@@ -158,15 +158,6 @@ func TestDecodeHeader_UnsupportedType(t *testing.T) {
 	}
 }
 
-func TestDecodeHeader_UnsupportedAlgorithm(t *testing.T) {
-	tkn := NewToken()
-	str := "eyJhbGciOiJJTlYiLCJ0eXAiOiJKV1QifQ=="
-
-	if err := decodeHeader(tkn, str); err != ErrUnsupportedAlgorithm {
-		t.Fatalf("expected %#q, got %#q", ErrUnsupportedAlgorithm, err)
-	}
-}
-
 func TestDecodePayload(t *testing.T) {
 	tkn := NewToken()
 	str := "eyJpYXQiOjE0MjQ3NzYzMDcsIm5iZiI6MTQyNDc3NjMwNiwiZXhwIjoxNDI0Nzc2MzA4LCJpc3MiOiJNeUlzc3VlciIsInN1YiI6Ik15U3ViamVjdCIsImF1ZCI6Ik15QXVkaWVuY2UiLCJzY29wZXMiOlsibXlfc2NvcGUiXX0="
@@ -417,38 +408,6 @@ func TestTokenExpired_False(t *testing.T) {
 	tkn.Expires = tkn.IssuedAt.Add(1 * time.Hour)
 	if tkn.Expired() {
 		t.Fatal("expected false, got true")
-	}
-}
-
-func TestTokenGetAlgorithm_HS256(t *testing.T) {
-	tkn := NewToken()
-	tkn.Algorithm = HS256
-	if _, err := tkn.getAlgorithm([]byte("secret")); err != nil {
-		t.Fatalf("expected nil, got %#q", err)
-	}
-}
-
-func TestTokenGetAlgorithm_HS384(t *testing.T) {
-	tkn := NewToken()
-	tkn.Algorithm = HS384
-	if _, err := tkn.getAlgorithm([]byte("secret")); err != nil {
-		t.Fatalf("expected nil, got %#q", err)
-	}
-}
-
-func TestTokenGetAlgorithm_HS512(t *testing.T) {
-	tkn := NewToken()
-	tkn.Algorithm = HS512
-	if _, err := tkn.getAlgorithm([]byte("secret")); err != nil {
-		t.Fatalf("expected nil, got %#q", err)
-	}
-}
-
-func TestTokenGetAlgorithm_UnsupportedAlgorithm(t *testing.T) {
-	tkn := NewToken()
-	tkn.Algorithm = Algorithm("INVALID")
-	if _, err := tkn.getAlgorithm([]byte("secret")); err != ErrUnsupportedAlgorithm {
-		t.Fatalf("expected %#q, got %#q", ErrUnsupportedAlgorithm, err)
 	}
 }
 

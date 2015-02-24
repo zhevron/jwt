@@ -1,13 +1,9 @@
 package jwt
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"hash"
 	"strings"
 	"time"
 )
@@ -60,13 +56,14 @@ func DecodeToken(token string, secret []byte) (*Token, error) {
 	}
 
 	if t.Algorithm != None {
-		h, err := t.getAlgorithm(secret)
-		if err != nil {
-			return nil, err
-		}
-		h.Write([]byte(fmt.Sprintf("%s.%s", s[0], s[1])))
+		tkn := fmt.Sprintf("%s.%s", s[0], s[1])
 
-		if s[2] != base64.URLEncoding.EncodeToString(h.Sum(nil)) {
+		signer, ok := supportedAlgorithms[t.Algorithm]
+		if !ok {
+			return nil, ErrUnsupportedAlgorithm
+		}
+
+		if s[2] != base64.URLEncoding.EncodeToString(signer(tkn, secret)) {
 			return nil, ErrInvalidSignature
 		}
 	}
@@ -99,9 +96,6 @@ func decodeHeader(t *Token, s string) error {
 	if v, ok := header["alg"]; ok {
 		if _, ok := v.(string); !ok {
 			return ErrInvalidToken
-		}
-		if _, ok := supportedAlgorithms[Algorithm(v.(string))]; !ok {
-			return ErrUnsupportedAlgorithm
 		}
 		t.Algorithm = Algorithm(v.(string))
 	}
@@ -193,23 +187,19 @@ func (t Token) Sign(secret []byte) (string, error) {
 		base64.URLEncoding.EncodeToString(payload),
 	)
 
+	signature := ""
 	if t.Algorithm != None {
-		h, err := t.getAlgorithm(secret)
-		if err != nil {
-			return "", err
+		signer, ok := supportedAlgorithms[t.Algorithm]
+		if !ok {
+			return "", ErrUnsupportedAlgorithm
 		}
-		h.Write([]byte(tkn))
-
-		return fmt.Sprintf(
-			"%s.%s",
-			tkn,
-			base64.URLEncoding.EncodeToString(h.Sum(nil)),
-		), nil
+		signature = base64.URLEncoding.EncodeToString(signer(tkn, secret))
 	}
 
 	return fmt.Sprintf(
-		"%s.",
+		"%s.%s",
 		tkn,
+		signature,
 	), nil
 }
 
@@ -248,22 +238,6 @@ func (t Token) Expired() bool {
 	}
 
 	return time.Now().UTC().After(t.Expires)
-}
-
-// getAlgorithm returns the algorithm used to sign the token.
-func (t Token) getAlgorithm(secret []byte) (hash.Hash, error) {
-	switch t.Algorithm {
-	case HS256:
-		return hmac.New(sha256.New, secret), nil
-
-	case HS384:
-		return hmac.New(sha512.New384, secret), nil
-
-	case HS512:
-		return hmac.New(sha512.New, secret), nil
-	}
-
-	return nil, ErrUnsupportedAlgorithm
 }
 
 // buildHeader builds a new header map ready for signing.
