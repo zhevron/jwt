@@ -355,6 +355,14 @@ func TestTokenVerify_InvalidIssuer(t *testing.T) {
 	}
 }
 
+func TestTokenVerify_InvalidSubject(t *testing.T) {
+	tkn := NewToken()
+	tkn.Subject = "MySubject"
+	if err := tkn.Verify("", "TestSubject", ""); err != ErrInvalidSubject {
+		t.Fatalf("expected %#q, got %#q", ErrInvalidSubject, err)
+	}
+}
+
 func TestTokenVerify_InvalidAudience(t *testing.T) {
 	tkn := NewToken()
 	tkn.Audience = "MyAudience"

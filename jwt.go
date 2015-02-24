@@ -66,6 +66,9 @@ var (
 	// ErrInvalidSignature is returned when the signature cannot be verified.
 	ErrInvalidSignature = errors.New("jwt: invalid signature")
 
+	// ErrInvalidSubject is returned when the subject cannot be verified.
+	ErrInvalidSubject = errors.New("jwt: invalid subject")
+
 	// ErrInvalidToken is returned when the token structure is invalid.
 	ErrInvalidToken = errors.New("jwt: invalid token")
 

@@ -211,6 +211,10 @@ func (t Token) Verify(issuer, subject, audience string) error {
 		return ErrInvalidIssuer
 	}
 
+	if len(subject) > 0 && subject != t.Subject {
+		return ErrInvalidSubject
+	}
+
 	if len(audience) > 0 && audience != t.Audience {
 		return ErrInvalidAudience
 	}
