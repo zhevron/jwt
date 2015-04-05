@@ -86,6 +86,9 @@ var (
 
 	// ErrUnsupportedTokenType is returned when an unsupported token type is used.
 	ErrUnsupportedTokenType = errors.New("jwt: unsupported token type")
+
+	// ErrNoneAlgorithmWithSecret is returned when the "none" algorithm is used with a secret.
+	ErrNoneAlgorithmWithSecret = errors.New("jwt: none algorithm with secret")
 )
 
 // supportedTypes is used to determine if a token type is supported.

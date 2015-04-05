@@ -47,7 +47,7 @@ func TestDecodeToken_HS512(t *testing.T) {
 
 func TestDecodeToken_Unsecured(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
-	tkn, err := DecodeToken(str, []byte("secret"))
+	tkn, err := DecodeToken(str, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,6 +101,14 @@ func TestDecodeToken_UnsupportedAlgorithm(t *testing.T) {
 	_, err := DecodeToken(str, []byte("secret"))
 	if err != ErrUnsupportedAlgorithm {
 		t.Fatalf("expected %#q, got %#q", ErrUnsupportedAlgorithm, err)
+	}
+}
+
+func TestDecodeToken_FailNoneWithSecret(t *testing.T) {
+	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
+	_, err := DecodeToken(str, []byte("secret"))
+	if err != ErrNoneAlgorithmWithSecret {
+		t.Fatalf("expected %#q, got %#q", ErrNoneAlgorithmWithSecret, err)
 	}
 }
 

@@ -66,6 +66,10 @@ func DecodeToken(token string, secret []byte) (*Token, error) {
 		if s[2] != base64.URLEncoding.EncodeToString(signer(tkn, secret)) {
 			return nil, ErrInvalidSignature
 		}
+	} else {
+		if len(secret) > 0 {
+			return nil, ErrNoneAlgorithmWithSecret
+		}
 	}
 
 	return t, nil
