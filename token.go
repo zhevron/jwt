@@ -39,7 +39,7 @@ func NewToken() *Token {
 // DecodeToken attempts to decode a JWT into a Token structure using the given
 // secret for verification. This function will only return an error if decoding
 // fails or the signature is invalid.
-func DecodeToken(token string, secret []byte) (*Token, error) {
+func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, error) {
 	s := strings.Split(token, ".")
 	if len(s) != 3 {
 		return nil, ErrInvalidToken
@@ -55,10 +55,14 @@ func DecodeToken(token string, secret []byte) (*Token, error) {
 		return nil, err
 	}
 
-	if t.Algorithm != None {
+	if len(string(algorithm)) == 0 {
+		algorithm = t.Algorithm
+	}
+
+	if algorithm != None {
 		tkn := fmt.Sprintf("%s.%s", s[0], s[1])
 
-		signer, ok := supportedAlgorithms[t.Algorithm]
+		signer, ok := supportedAlgorithms[algorithm]
 		if !ok {
 			return nil, ErrUnsupportedAlgorithm
 		}

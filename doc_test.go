@@ -6,7 +6,7 @@ func ExampleToken_decode() {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNeUlzc3VlciIsInNjb3BlcyI6WyJteV9zY29wZSJdfQ._rCzwTmDAHuUq8XNsBjLMfxHJM8Jj_H3l8-ZoPKL4TQ"
 
 	secret := []byte("secret")
-	token, err := DecodeToken(str, secret)
+	token, err := DecodeToken(str, HS256, secret)
 	if err != nil {
 		panic(err)
 	}
