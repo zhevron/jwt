@@ -277,8 +277,11 @@ func (t Token) Expired() bool {
 func (t Token) buildHeader() map[string]interface{} {
 	header := make(map[string]interface{})
 
-	header["typ"] = "JWT"
+	header["typ"] = t.Type
 	header["alg"] = t.Algorithm
+	if len(t.KeyID) > 0 {
+		header["kid"] = t.KeyID
+	}
 
 	return header
 }
