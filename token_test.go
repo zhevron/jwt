@@ -12,40 +12,7 @@ func TestNewToken(t *testing.T) {
 	}
 }
 
-func TestDecodeToken_HS256(t *testing.T) {
-	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
-	tkn, err := DecodeToken(str, "", []byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if tkn.Issuer != "MyIssuer" {
-		t.Fatalf("expected %#q, got %#q", "MyIssuer", tkn.Issuer)
-	}
-}
-
-func TestDecodeToken_HS384(t *testing.T) {
-	str := "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.BpHZzG_ocKno1rT21T1FHlJH_hK3r4luraPhRfDp2F0ynB2rApS5IYsoVAWFy75J"
-	tkn, err := DecodeToken(str, "", []byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if tkn.Issuer != "MyIssuer" {
-		t.Fatalf("expected %#q, got %#q", "MyIssuer", tkn.Issuer)
-	}
-}
-
-func TestDecodeToken_HS512(t *testing.T) {
-	str := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.vqhUi4XHe121nCmlvwIpMGCpV4qPk37slr6JuRNrcRiU9Fm9bx82cq7W2AIndudGVcV9Tlk38tD10sPcKeb7Lg=="
-	tkn, err := DecodeToken(str, "", []byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if tkn.Issuer != "MyIssuer" {
-		t.Fatalf("expected %#q, got %#q", "MyIssuer", tkn.Issuer)
-	}
-}
-
-func TestDecodeToken_Unsecured(t *testing.T) {
+func TestDecodeToken(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
 	tkn, err := DecodeToken(str, "", nil)
 	if err != nil {
@@ -263,61 +230,7 @@ func TestDecodePayload_InvalidExpires(t *testing.T) {
 	}
 }
 
-func TestTokenSign_HS256(t *testing.T) {
-	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
-	tkn := NewToken()
-	tkn.Algorithm = HS256
-	tkn.Issuer = "MyIssuer"
-	tkn.IssuedAt = time.Unix(1424776307, 0)
-	tkn.NotBefore = time.Unix(1424776307, 0)
-	tkn.Expires = time.Unix(1424776307, 0)
-	tkn.Claims["scopes"] = []string{"my_scope"}
-	s, err := tkn.Sign([]byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if str != s {
-		t.Fatalf("expected %#q, got %#q", str, s)
-	}
-}
-
-func TestTokenSign_HS384(t *testing.T) {
-	str := "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.BpHZzG_ocKno1rT21T1FHlJH_hK3r4luraPhRfDp2F0ynB2rApS5IYsoVAWFy75J"
-	tkn := NewToken()
-	tkn.Algorithm = HS384
-	tkn.Issuer = "MyIssuer"
-	tkn.IssuedAt = time.Unix(1424776307, 0)
-	tkn.NotBefore = time.Unix(1424776307, 0)
-	tkn.Expires = time.Unix(1424776307, 0)
-	tkn.Claims["scopes"] = []string{"my_scope"}
-	s, err := tkn.Sign([]byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if str != s {
-		t.Fatalf("expected %#q, got %#q", str, s)
-	}
-}
-
-func TestTokenSign_HS512(t *testing.T) {
-	str := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.vqhUi4XHe121nCmlvwIpMGCpV4qPk37slr6JuRNrcRiU9Fm9bx82cq7W2AIndudGVcV9Tlk38tD10sPcKeb7Lg=="
-	tkn := NewToken()
-	tkn.Algorithm = HS512
-	tkn.Issuer = "MyIssuer"
-	tkn.IssuedAt = time.Unix(1424776307, 0)
-	tkn.NotBefore = time.Unix(1424776307, 0)
-	tkn.Expires = time.Unix(1424776307, 0)
-	tkn.Claims["scopes"] = []string{"my_scope"}
-	s, err := tkn.Sign([]byte("secret"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if str != s {
-		t.Fatalf("expected %#q, got %#q", str, s)
-	}
-}
-
-func TestTokenSign_Unsecured(t *testing.T) {
+func TestTokenSign(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
 	tkn := NewToken()
 	tkn.Algorithm = None

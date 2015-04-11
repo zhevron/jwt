@@ -8,7 +8,16 @@ import (
 )
 
 // Signer is used by the signing packages to sign tokens.
-type Signer func(string, []byte) []byte
+type Signer func(string, []byte) string
+
+// Verifier is used by the signing packages to verify signatures.
+type Verifier func(string, string, []byte) bool
+
+// signingPair is used for internal mapping of signing/verifying functions.
+type signingPair struct {
+	Signer   Signer
+	Verifier Verifier
+}
 
 // Type is used to define the type of token.
 type Type string
@@ -97,11 +106,11 @@ var supportedTypes = map[Type]bool{
 }
 
 // supportedAlgorithms is used to determine if an algorithm is supported.
-var supportedAlgorithms = map[Algorithm]Signer{
-	None:  nil,
-	HS256: hmac.HS256,
-	HS384: hmac.HS384,
-	HS512: hmac.HS512,
+var supportedAlgorithms = map[Algorithm]signingPair{
+	None:  {nil, nil},
+	HS256: {hmac.SignHS256, hmac.VerifyHS256},
+	HS384: {hmac.SignHS384, hmac.VerifyHS384},
+	HS512: {hmac.SignHS512, hmac.VerifyHS512},
 }
 
 // reservedClaims is used to make sure no reserved claims are used in user data.

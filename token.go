@@ -67,12 +67,12 @@ func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, erro
 	if algorithm != None {
 		tkn := fmt.Sprintf("%s.%s", s[0], s[1])
 
-		signer, ok := supportedAlgorithms[algorithm]
+		pair, ok := supportedAlgorithms[algorithm]
 		if !ok {
 			return nil, ErrUnsupportedAlgorithm
 		}
 
-		if s[2] != base64.URLEncoding.EncodeToString(signer(tkn, secret)) {
+		if !pair.Verifier(tkn, s[2], secret) {
 			return nil, ErrInvalidSignature
 		}
 	} else {
@@ -202,11 +202,11 @@ func (t Token) Sign(secret []byte) (string, error) {
 
 	signature := ""
 	if t.Algorithm != None {
-		signer, ok := supportedAlgorithms[t.Algorithm]
+		pair, ok := supportedAlgorithms[t.Algorithm]
 		if !ok {
 			return "", ErrUnsupportedAlgorithm
 		}
-		signature = base64.URLEncoding.EncodeToString(signer(tkn, secret))
+		signature = pair.Signer(tkn, secret)
 	}
 
 	return fmt.Sprintf(
