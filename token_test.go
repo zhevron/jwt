@@ -106,6 +106,51 @@ func TestDecodeToken_FailManualAlgorithm(t *testing.T) {
 	}
 }
 
+func TestDecodeToken_KeyLookup(t *testing.T) {
+	str := "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik15S2V5IiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.QyceulrMdZq-GGto_6YqxgooRs4FNxVIjLaYm1eBoXs="
+	KeyLookupCallback = func(kid string) Algorithm {
+		if kid == "MyKey" {
+			return HS256
+		}
+		return ""
+	}
+	_, err := DecodeToken(str, None, []byte("secret"))
+	KeyLookupCallback = nil
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDecodeToken_NoKeyProvided(t *testing.T) {
+	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
+	KeyLookupCallback = func(kid string) Algorithm {
+		if kid == "MyKey" {
+			return HS256
+		}
+		return ""
+	}
+	_, err := DecodeToken(str, None, []byte("secret"))
+	KeyLookupCallback = nil
+	if err != ErrNoKeyProvided {
+		t.Fatalf("expected %#q, got %#q", ErrNoKeyProvided, err)
+	}
+}
+
+func TestDecodeToken_NonExistantKey(t *testing.T) {
+	str := "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik15S2V5IiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.QyceulrMdZq-GGto_6YqxgooRs4FNxVIjLaYm1eBoXs="
+	KeyLookupCallback = func(kid string) Algorithm {
+		if kid == "MyOtherKey" {
+			return HS256
+		}
+		return ""
+	}
+	_, err := DecodeToken(str, None, []byte("secret"))
+	KeyLookupCallback = nil
+	if err != ErrNonExistantKey {
+		t.Fatalf("expected %#q, got %#q", ErrNonExistantKey, err)
+	}
+}
+
 func TestDecodeHeader(t *testing.T) {
 	tkn := NewToken()
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
@@ -145,6 +190,15 @@ func TestDecodeHeader_InvalidType(t *testing.T) {
 func TestDecodeHeader_InvalidAlgorithm(t *testing.T) {
 	tkn := NewToken()
 	str := "eyJhbGciOjEsInR5cCI6IkpXVCJ9"
+
+	if err := decodeHeader(tkn, str); err != ErrInvalidToken {
+		t.Fatalf("expected %#q, got %#q", ErrInvalidToken, err)
+	}
+}
+
+func TestDecodeHeader_InvalidKeyID(t *testing.T) {
+	tkn := NewToken()
+	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6MX0="
 
 	if err := decodeHeader(tkn, str); err != ErrInvalidToken {
 		t.Fatalf("expected %#q, got %#q", ErrInvalidToken, err)
@@ -242,8 +296,9 @@ func TestDecodePayload_InvalidExpires(t *testing.T) {
 }
 
 func TestTokenSign(t *testing.T) {
-	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
+	str := "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik15S2V5IiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.QyceulrMdZq-GGto_6YqxgooRs4FNxVIjLaYm1eBoXs="
 	tkn := NewToken()
+	tkn.KeyID = "MyKey"
 	tkn.Issuer = "MyIssuer"
 	tkn.IssuedAt = time.Unix(1424776307, 0)
 	tkn.NotBefore = time.Unix(1424776307, 0)
