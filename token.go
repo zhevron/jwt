@@ -39,6 +39,11 @@ func NewToken() *Token {
 // DecodeToken attempts to decode a JWT into a Token structure using the given
 // secret for verification. This function will only return an error if decoding
 // fails or the signature is invalid.
+//
+// Note: If you provide an Algirithm of "", the decoding will use the algorithm
+// provided by the token header. This is considered insecure and should not be
+// used in production. This functionality may be removed at a later point to
+// ensure that no users are unintentionally harming their applications.
 func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, error) {
 	s := strings.Split(token, ".")
 	if len(s) != 3 {
