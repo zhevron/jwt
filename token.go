@@ -179,10 +179,7 @@ func decodePayload(t *Token, s string) error {
 // Sign signs the token with the given secret and returns the base64 encoded
 // string value of the token.
 func (t Token) Sign(secret []byte) (string, error) {
-	header, err := json.Marshal(t.buildHeader())
-	if err != nil {
-		return "", err
-	}
+	header, _ := json.Marshal(t.buildHeader())
 
 	claims, err := t.buildClaims()
 	if err != nil {
