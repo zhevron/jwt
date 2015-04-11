@@ -13,6 +13,17 @@ func TestNewToken(t *testing.T) {
 }
 
 func TestDecodeToken(t *testing.T) {
+	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
+	tkn, err := DecodeToken(str, "", []byte("secret"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tkn.Issuer != "MyIssuer" {
+		t.Fatalf("expected %#q, got %#q", "MyIssuer", tkn.Issuer)
+	}
+}
+
+func TestDecodeToken_NoneAlgorithm(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
 	tkn, err := DecodeToken(str, "", nil)
 	if err != nil {
@@ -231,6 +242,23 @@ func TestDecodePayload_InvalidExpires(t *testing.T) {
 }
 
 func TestTokenSign(t *testing.T) {
+	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
+	tkn := NewToken()
+	tkn.Issuer = "MyIssuer"
+	tkn.IssuedAt = time.Unix(1424776307, 0)
+	tkn.NotBefore = time.Unix(1424776307, 0)
+	tkn.Expires = time.Unix(1424776307, 0)
+	tkn.Claims["scopes"] = []string{"my_scope"}
+	s, err := tkn.Sign([]byte("secret"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if str != s {
+		t.Fatalf("expected %#q, got %#q", str, s)
+	}
+}
+
+func TestTokenSign_NoneAlgorithm(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
 	tkn := NewToken()
 	tkn.Algorithm = None
