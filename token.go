@@ -12,6 +12,7 @@ import (
 type Token struct {
 	Type      Type
 	Algorithm Algorithm
+	KeyID     string
 	Issuer    string
 	Subject   string
 	Audience  string
@@ -64,6 +65,17 @@ func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, erro
 		algorithm = t.Algorithm
 	}
 
+	if KeyLookupCallback != nil {
+		if len(t.KeyID) == 0 {
+			return nil, ErrNoKeyProvided
+		}
+
+		algorithm = KeyLookupCallback(t.KeyID)
+		if len(string(algorithm)) == 0 {
+			return nil, ErrNonExistantKey
+		}
+	}
+
 	if algorithm != None {
 		tkn := fmt.Sprintf("%s.%s", s[0], s[1])
 
@@ -111,6 +123,13 @@ func decodeHeader(t *Token, s string) error {
 			return ErrInvalidToken
 		}
 		t.Algorithm = Algorithm(v.(string))
+	}
+
+	if v, ok := header["kid"]; ok {
+		if _, ok := v.(string); !ok {
+			return ErrInvalidToken
+		}
+		t.KeyID = v.(string)
 	}
 
 	return nil

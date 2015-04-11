@@ -98,7 +98,17 @@ var (
 
 	// ErrNoneAlgorithmWithSecret is returned when the "none" algorithm is used with a secret.
 	ErrNoneAlgorithmWithSecret = errors.New("jwt: none algorithm with secret")
+
+	// ErrNoKeyProvided is returned when the key lookup callback is set, but no key is in the token.
+	ErrNoKeyProvided = errors.New("jwt: no key provided")
+
+	// ErrNonExistantKey is returned when the provided key ID does not exist.
+	ErrNonExistantKey = errors.New("jwt: non-existant key")
 )
+
+// KeyLookupCallback is used by DecodeToken to look up the algorithm to decode with
+// if the "kid" header is specified in the token.
+var KeyLookupCallback func(string) Algorithm
 
 // supportedTypes is used to determine if a token type is supported.
 var supportedTypes = map[Type]bool{
