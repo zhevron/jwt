@@ -72,8 +72,8 @@ func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, erro
 			return nil, ErrUnsupportedAlgorithm
 		}
 
-		if !pair.Verifier(tkn, s[2], secret) {
-			return nil, ErrInvalidSignature
+		if err := pair.Verifier(tkn, s[2], secret); err != nil {
+			return nil, err
 		}
 	} else {
 		if len(secret) > 0 {
@@ -203,7 +203,10 @@ func (t Token) Sign(secret []byte) (string, error) {
 		if !ok {
 			return "", ErrUnsupportedAlgorithm
 		}
-		signature = pair.Signer(tkn, secret)
+		signature, err = pair.Signer(tkn, secret)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return fmt.Sprintf(
