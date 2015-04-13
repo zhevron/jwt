@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/zhevron/jwt/hmac"
+	"github.com/zhevron/jwt/rsa"
 )
 
 // Signer is used by the signing packages to sign tokens.
@@ -118,6 +119,9 @@ var supportedAlgorithms = map[Algorithm]signingPair{
 	HS256: {hmac.SignHS256, hmac.VerifyHS256},
 	HS384: {hmac.SignHS384, hmac.VerifyHS384},
 	HS512: {hmac.SignHS512, hmac.VerifyHS512},
+	RS256: {rsa.SignRS256, rsa.VerifyRS256},
+	RS384: {rsa.SignRS384, rsa.VerifyRS384},
+	RS512: {rsa.SignRS512, rsa.VerifyRS512},
 }
 
 // reservedClaims is used to make sure no reserved claims are used in user data.
