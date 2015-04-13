@@ -4,6 +4,7 @@ package jwt
 import (
 	"errors"
 
+	"github.com/zhevron/jwt/ecdsa"
 	"github.com/zhevron/jwt/hmac"
 	"github.com/zhevron/jwt/rsa"
 )
@@ -122,6 +123,9 @@ var supportedAlgorithms = map[Algorithm]signingPair{
 	RS256: {rsa.SignRS256, rsa.VerifyRS256},
 	RS384: {rsa.SignRS384, rsa.VerifyRS384},
 	RS512: {rsa.SignRS512, rsa.VerifyRS512},
+	ES256: {ecdsa.SignES256, ecdsa.VerifyES256},
+	ES384: {ecdsa.SignES384, ecdsa.VerifyES384},
+	ES512: {ecdsa.SignES512, ecdsa.VerifyES512},
 }
 
 // reservedClaims is used to make sure no reserved claims are used in user data.
