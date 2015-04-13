@@ -84,8 +84,8 @@ func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, erro
 			return nil, ErrUnsupportedAlgorithm
 		}
 
-		if !pair.Verifier(tkn, s[2], secret) {
-			return nil, ErrInvalidSignature
+		if err := pair.Verifier(tkn, s[2], secret); err != nil {
+			return nil, err
 		}
 	} else {
 		if len(secret) > 0 {
@@ -198,7 +198,10 @@ func decodePayload(t *Token, s string) error {
 // Sign signs the token with the given secret and returns the base64 encoded
 // string value of the token.
 func (t Token) Sign(secret []byte) (string, error) {
-	header, _ := json.Marshal(t.buildHeader())
+	header, err := json.Marshal(t.buildHeader())
+	if err != nil {
+		return "", err
+	}
 
 	claims, err := t.buildClaims()
 	if err != nil {
@@ -222,7 +225,10 @@ func (t Token) Sign(secret []byte) (string, error) {
 		if !ok {
 			return "", ErrUnsupportedAlgorithm
 		}
-		signature = pair.Signer(tkn, secret)
+		signature, err = pair.Signer(tkn, secret)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return fmt.Sprintf(

@@ -10,73 +10,91 @@ var SignatureHS384 = "1iCCiZmnb_BxpDevfB1Af10qVNEEoKzhC-K-HrdZEauAKBWCeyT-syWZYv
 var SignatureHS512 = "nbv50JDKuBqZ1vmIvCOg4YoZUiiecuZAWCm8Q61PvtyajjuUHTrOGCUtWI6XwYKPN2n-8S_AZRqW2AoREOgLXg=="
 
 func TestSignHS256(t *testing.T) {
-	if str := SignHS256(Token, Secret); str != SignatureHS256 {
+	str, err := SignHS256(Token, Secret)
+	if err != nil {
+		t.Fatalf("expected nil, got %#q", err)
+	}
+	if str != SignatureHS256 {
 		t.Fatalf("expected %#q, got %#q", SignatureHS256, str)
 	}
 }
 
 func TestSignHS384(t *testing.T) {
-	if str := SignHS384(Token, Secret); str != SignatureHS384 {
+	str, err := SignHS384(Token, Secret)
+	if err != nil {
+		t.Fatalf("expected nil, got %#q", err)
+	}
+	if str != SignatureHS384 {
 		t.Fatalf("expected %#q, got %#q", SignatureHS384, str)
 	}
 }
 
 func TestSignHS512(t *testing.T) {
-	if str := SignHS512(Token, Secret); str != SignatureHS512 {
+	str, err := SignHS512(Token, Secret)
+	if err != nil {
+		t.Fatalf("expected nil, got %#q", err)
+	}
+	if str != SignatureHS512 {
 		t.Fatalf("expected %#q, got %#q", SignatureHS512, str)
 	}
 }
 
 func TestSignHS256_Fail(t *testing.T) {
-	if str := SignHS256(Token, []byte("INVALID")); str == SignatureHS256 {
-		t.Fatalf("expected != %#q", SignatureHS256)
+	str, _ := SignHS256(Token, []byte("INVALID"))
+	if str == SignatureHS256 {
+		t.Fatalf("expected non-%#q, got %#q", SignatureHS256, str)
 	}
 }
 
 func TestSignHS384_Fail(t *testing.T) {
-	if str := SignHS384(Token, []byte("INVALID")); str == SignatureHS384 {
-		t.Fatalf("expected != %#q", SignatureHS384)
+	str, _ := SignHS384(Token, []byte("INVALID"))
+	if str == SignatureHS384 {
+		t.Fatalf("expected non-%#q, got %#q", SignatureHS384, str)
 	}
 }
 
 func TestSignHS512_Fail(t *testing.T) {
-	if str := SignHS512(Token, []byte("INVALID")); str == SignatureHS512 {
-		t.Fatalf("expected != %#q", SignatureHS512)
+	str, _ := SignHS512(Token, []byte("INVALID"))
+	if str == SignatureHS512 {
+		t.Fatalf("expected non-%#q, got %#q", SignatureHS512, str)
 	}
 }
 
 func TestVerifyHS256(t *testing.T) {
-	if !VerifyHS256(Token, SignatureHS256, Secret) {
-		t.Fatal("expected true, got false")
+	if err := VerifyHS256(Token, SignatureHS256, Secret); err != nil {
+		t.Fatalf("expected nil, got %#q", err)
 	}
 }
 
 func TestVerifyHS384(t *testing.T) {
-	if !VerifyHS384(Token, SignatureHS384, Secret) {
-		t.Fatal("expected true, got false")
+	if err := VerifyHS384(Token, SignatureHS384, Secret); err != nil {
+		t.Fatalf("expected nil, got %#q", err)
 	}
 }
 
 func TestVerifyHS512(t *testing.T) {
-	if !VerifyHS512(Token, SignatureHS512, Secret) {
-		t.Fatal("expected true, got false")
+	if err := VerifyHS512(Token, SignatureHS512, Secret); err != nil {
+		t.Fatalf("expected nil, got %#q", err)
 	}
 }
 
 func TestVerifyHS256_Fail(t *testing.T) {
-	if VerifyHS256(Token, SignatureHS256, []byte("INVALID")) {
-		t.Fatal("expected false, got true")
+	err := VerifyHS256(Token, SignatureHS256, []byte("Key"))
+	if err != ErrVerifyFailed {
+		t.Fatalf("expected %#q, got %#q", ErrVerifyFailed, err)
 	}
 }
 
 func TestVerifyHS384_Fail(t *testing.T) {
-	if VerifyHS384(Token, SignatureHS384, []byte("INVALID")) {
-		t.Fatal("expected false, got true")
+	err := VerifyHS384(Token, SignatureHS384, []byte("Key"))
+	if err != ErrVerifyFailed {
+		t.Fatalf("expected %#q, got %#q", ErrVerifyFailed, err)
 	}
 }
 
 func TestVerifyHS512_Fail(t *testing.T) {
-	if VerifyHS512(Token, SignatureHS512, []byte("INVALID")) {
-		t.Fatal("expected false, got true")
+	err := VerifyHS512(Token, SignatureHS512, []byte("Key"))
+	if err != ErrVerifyFailed {
+		t.Fatalf("expected %#q, got %#q", ErrVerifyFailed, err)
 	}
 }

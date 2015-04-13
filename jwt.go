@@ -8,10 +8,10 @@ import (
 )
 
 // Signer is used by the signing packages to sign tokens.
-type Signer func(string, []byte) string
+type Signer func(string, []byte) (string, error)
 
 // Verifier is used by the signing packages to verify signatures.
-type Verifier func(string, string, []byte) bool
+type Verifier func(string, string, []byte) error
 
 // signingPair is used for internal mapping of signing/verifying functions.
 type signingPair struct {
@@ -71,9 +71,6 @@ var (
 
 	// ErrInvalidIssuer is returned when the issuer cannot be verified.
 	ErrInvalidIssuer = errors.New("jwt: invalid issuer")
-
-	// ErrInvalidSignature is returned when the signature cannot be verified.
-	ErrInvalidSignature = errors.New("jwt: invalid signature")
 
 	// ErrInvalidSubject is returned when the subject cannot be verified.
 	ErrInvalidSubject = errors.New("jwt: invalid subject")
