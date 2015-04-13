@@ -2,13 +2,11 @@
 package ecdsa
 
 import (
-	"bytes"
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/binary"
 	"encoding/pem"
 	"errors"
 	"math/big"
@@ -20,6 +18,9 @@ var (
 
 	// ErrInvalidKey is returned when the given key is not a valid ECDSA key.
 	ErrInvalidKey = errors.New("jwt/ecdsa: invalid key")
+
+	//ErrInvalidSignature is returned when the signature provided cannot be decoded.
+	ErrInvalidSignature = errors.New("jwt/ecdsa: invalid signature")
 )
 
 // SignES256 signs the given token with the given secret using ECDSA SHA-256.
@@ -109,19 +110,14 @@ func verifySignature(tkn, sig string, h crypto.Hash, k *ecdsa.PublicKey) error {
 		return err
 	}
 
-	var br, bs [32]byte
-	buf := bytes.NewReader(b)
-	if err := binary.Read(buf, binary.BigEndian, &br); err != nil {
-		return err
-	}
-	if err := binary.Read(buf, binary.BigEndian, &bs); err != nil {
-		return err
+	if len(b) != 64 {
+		return ErrInvalidSignature
 	}
 
 	r := new(big.Int)
-	r.SetBytes(br[:])
+	r.SetBytes(b[:32])
 	s := new(big.Int)
-	s.SetBytes(bs[:])
+	s.SetBytes(b[32:])
 
 	if !ecdsa.Verify(k, hash.Sum(nil), r, s) {
 		return ErrVerifyFailed
