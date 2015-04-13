@@ -17,6 +17,8 @@ You can install the library using the standard `go get` command:
 go get gopkg.in/zhevron/jwt.v1
 ```
 
+**Note:** This package requires Go 1.3 or higher.
+
 ## License
 
 **jwt** is licensed under the [MIT license](http://opensource.org/licenses/MIT).
