@@ -72,9 +72,6 @@ var (
 	// ErrInvalidIssuer is returned when the issuer cannot be verified.
 	ErrInvalidIssuer = errors.New("jwt: invalid issuer")
 
-	// ErrInvalidSignature is returned when the signature cannot be verified.
-	ErrInvalidSignature = errors.New("jwt: invalid signature")
-
 	// ErrInvalidSubject is returned when the subject cannot be verified.
 	ErrInvalidSubject = errors.New("jwt: invalid subject")
 

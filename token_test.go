@@ -3,6 +3,8 @@ package jwt
 import (
 	"testing"
 	"time"
+
+	"github.com/zhevron/jwt/hmac"
 )
 
 func TestNewToken(t *testing.T) {
@@ -61,8 +63,8 @@ func TestDecodeToken_InvalidPayload(t *testing.T) {
 func TestDecodeToken_InvalidSignature(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0MjQ3NzY0NzAsImlhdCI6MTQyNDc3NjMwNywiaXNzIjoiTXlJc3N1ZXIiLCJzY29wZXMiOlsibXlfc2NvcGUiXX0=.zs_EW5i5gSmI660LlklPhtm8oH8ltf-vZMI3TDaOFH4="
 	_, err := DecodeToken(str, "", []byte("_secret"))
-	if err != ErrInvalidSignature {
-		t.Fatalf("expected %#q, got %#q", ErrInvalidSignature, err)
+	if err != hmac.ErrVerifyFailed {
+		t.Fatalf("expected %#q, got %#q", hmac.ErrVerifyFailed, err)
 	}
 }
 
@@ -101,8 +103,8 @@ func TestDecodeToken_ManualAlgorithm(t *testing.T) {
 func TestDecodeToken_FailManualAlgorithm(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
 	_, err := DecodeToken(str, HS512, []byte("secret"))
-	if err != ErrInvalidSignature {
-		t.Fatalf("expected %#q, got %#q", ErrInvalidSignature, err)
+	if err != hmac.ErrVerifyFailed {
+		t.Fatalf("expected %#q, got %#q", hmac.ErrVerifyFailed, err)
 	}
 }
 
