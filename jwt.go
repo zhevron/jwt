@@ -103,9 +103,6 @@ var (
 
 	// ErrNonExistantKey is returned when the provided key ID does not exist.
 	ErrNonExistantKey = errors.New("jwt: non-existant key")
-
-	// ErrUnsupportedKeyType is returned when the secret is not a supported type.
-	ErrUnsupportedKeyType = errors.New("jwt: unsupported key type")
 )
 
 // KeyLookupCallback is used by DecodeToken to look up the algorithm to decode with

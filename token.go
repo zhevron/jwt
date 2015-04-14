@@ -91,11 +91,7 @@ func DecodeToken(token string, algorithm Algorithm, secret interface{}) (*Token,
 			return nil, err
 		}
 	} else {
-		if _, ok := secret.(string); !ok {
-			return nil, ErrUnsupportedKeyType
-		}
-
-		if len(secret.(string)) > 0 {
+		if secret != nil {
 			return nil, ErrNoneAlgorithmWithSecret
 		}
 	}

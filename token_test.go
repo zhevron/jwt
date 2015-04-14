@@ -153,14 +153,6 @@ func TestDecodeToken_NonExistantKey(t *testing.T) {
 	}
 }
 
-func TestDecodeToken_UnsupportedKeyType(t *testing.T) {
-	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
-	_, err := DecodeToken(str, "", nil)
-	if err != ErrUnsupportedKeyType {
-		t.Fatalf("expected %#q, got %#q", ErrUnsupportedKeyType, err)
-	}
-}
-
 func TestDecodeHeader(t *testing.T) {
 	tkn := NewToken()
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
