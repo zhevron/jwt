@@ -45,7 +45,7 @@ func NewToken() *Token {
 // provided by the token header. This is considered insecure and should not be
 // used in production. This functionality may be removed at a later point to
 // ensure that no users are unintentionally harming their applications.
-func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, error) {
+func DecodeToken(token string, algorithm Algorithm, secret interface{}) (*Token, error) {
 	s := strings.Split(token, ".")
 	if len(s) != 3 {
 		return nil, ErrInvalidToken
@@ -88,7 +88,11 @@ func DecodeToken(token string, algorithm Algorithm, secret []byte) (*Token, erro
 			return nil, err
 		}
 	} else {
-		if len(secret) > 0 {
+		if _, ok := secret.(string); !ok {
+			return nil, ErrUnsupportedKeyType
+		}
+
+		if len(secret.(string)) > 0 {
 			return nil, ErrNoneAlgorithmWithSecret
 		}
 	}
@@ -197,7 +201,7 @@ func decodePayload(t *Token, s string) error {
 
 // Sign signs the token with the given secret and returns the base64 encoded
 // string value of the token.
-func (t Token) Sign(secret []byte) (string, error) {
+func (t Token) Sign(secret interface{}) (string, error) {
 	header, err := json.Marshal(t.buildHeader())
 	if err != nil {
 		return "", err

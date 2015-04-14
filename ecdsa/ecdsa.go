@@ -19,12 +19,15 @@ var (
 	// ErrInvalidKey is returned when the given key is not a valid ECDSA key.
 	ErrInvalidKey = errors.New("jwt/ecdsa: invalid key")
 
-	//ErrInvalidSignature is returned when the signature provided cannot be decoded.
+	// ErrInvalidSignature is returned when the signature provided cannot be decoded.
 	ErrInvalidSignature = errors.New("jwt/ecdsa: invalid signature")
+
+	// ErrUnsupportedKeyType is returned when the secret is not a supported type.
+	ErrUnsupportedKeyType = errors.New("jwt/ecdsa: unsupported key type")
 )
 
 // SignES256 signs the given token with the given secret using ECDSA SHA-256.
-func SignES256(token string, secret []byte) (string, error) {
+func SignES256(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
 		return "", err
@@ -34,7 +37,7 @@ func SignES256(token string, secret []byte) (string, error) {
 }
 
 // SignES384 signs the given token with the given secret using ECDSA SHA-384.
-func SignES384(token string, secret []byte) (string, error) {
+func SignES384(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
 		return "", err
@@ -44,7 +47,7 @@ func SignES384(token string, secret []byte) (string, error) {
 }
 
 // SignES512 signs the given token with the given secret using ECDSA SHA-512.
-func SignES512(token string, secret []byte) (string, error) {
+func SignES512(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
 		return "", err
@@ -54,7 +57,7 @@ func SignES512(token string, secret []byte) (string, error) {
 }
 
 // VerifyES256 verifies the given signature using the given secret.
-func VerifyES256(token, signature string, secret []byte) error {
+func VerifyES256(token, signature string, secret interface{}) error {
 	k, err := publicKey(secret)
 	if err != nil {
 		return err
@@ -64,7 +67,7 @@ func VerifyES256(token, signature string, secret []byte) error {
 }
 
 // VerifyES384 verifies the given signature using the given secret.
-func VerifyES384(token, signature string, secret []byte) error {
+func VerifyES384(token, signature string, secret interface{}) error {
 	k, err := publicKey(secret)
 	if err != nil {
 		return err
@@ -74,7 +77,7 @@ func VerifyES384(token, signature string, secret []byte) error {
 }
 
 // VerifyES512 verifies the given signature using the given secret.
-func VerifyES512(token, signature string, secret []byte) error {
+func VerifyES512(token, signature string, secret interface{}) error {
 	k, err := publicKey(secret)
 	if err != nil {
 		return err
@@ -127,47 +130,67 @@ func verifySignature(tkn, sig string, h crypto.Hash, k *ecdsa.PublicKey) error {
 }
 
 // privateKey returns the ECDSA private key from the secret.
-func privateKey(key []byte) (*ecdsa.PrivateKey, error) {
-	b, _ := pem.Decode(key)
-	if b == nil {
+func privateKey(key interface{}) (*ecdsa.PrivateKey, error) {
+	switch key.(type) {
+	case *ecdsa.PrivateKey:
+		return key.(*ecdsa.PrivateKey), nil
+
+	case string:
+		return privateKey([]byte(key.(string)))
+
+	case []byte:
+		b, _ := pem.Decode(key.([]byte))
+		if b == nil {
+			return nil, ErrInvalidKey
+		}
+
+		var k interface{}
+		k, err := x509.ParseECPrivateKey(b.Bytes)
+		if err != nil {
+			if k, err = x509.ParsePKCS8PrivateKey(b.Bytes); err != nil {
+				return nil, err
+			}
+		}
+
+		if k, ok := k.(*ecdsa.PrivateKey); ok {
+			return k, nil
+		}
 		return nil, ErrInvalidKey
 	}
 
-	var k interface{}
-	k, err := x509.ParseECPrivateKey(b.Bytes)
-	if err != nil {
-		if k, err = x509.ParsePKCS8PrivateKey(b.Bytes); err != nil {
-			return nil, err
-		}
-	}
-
-	if k, ok := k.(*ecdsa.PrivateKey); ok {
-		return k, nil
-	}
-
-	return nil, ErrInvalidKey
+	return nil, ErrUnsupportedKeyType
 }
 
 // publicKey returns the ECDSA public key from the secret.
-func publicKey(key []byte) (*ecdsa.PublicKey, error) {
-	b, _ := pem.Decode(key)
-	if b == nil {
+func publicKey(key interface{}) (*ecdsa.PublicKey, error) {
+	switch key.(type) {
+	case *ecdsa.PublicKey:
+		return key.(*ecdsa.PublicKey), nil
+
+	case string:
+		return publicKey([]byte(key.(string)))
+
+	case []byte:
+		b, _ := pem.Decode(key.([]byte))
+		if b == nil {
+			return nil, ErrInvalidKey
+		}
+
+		var k interface{}
+		k, err := x509.ParsePKIXPublicKey(b.Bytes)
+		if err != nil {
+			if c, err := x509.ParseCertificate(b.Bytes); err == nil {
+				k = c.PublicKey
+			} else {
+				return nil, ErrInvalidKey
+			}
+		}
+
+		if k, ok := k.(*ecdsa.PublicKey); ok {
+			return k, nil
+		}
 		return nil, ErrInvalidKey
 	}
 
-	var k interface{}
-	k, err := x509.ParsePKIXPublicKey(b.Bytes)
-	if err != nil {
-		if c, err := x509.ParseCertificate(b.Bytes); err == nil {
-			k = c.PublicKey
-		} else {
-			return nil, ErrInvalidKey
-		}
-	}
-
-	if k, ok := k.(*ecdsa.PublicKey); ok {
-		return k, nil
-	}
-
-	return nil, ErrInvalidKey
+	return nil, ErrUnsupportedKeyType
 }

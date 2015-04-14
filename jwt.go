@@ -10,10 +10,10 @@ import (
 )
 
 // Signer is used by the signing packages to sign tokens.
-type Signer func(string, []byte) (string, error)
+type Signer func(string, interface{}) (string, error)
 
 // Verifier is used by the signing packages to verify signatures.
-type Verifier func(string, string, []byte) error
+type Verifier func(string, string, interface{}) error
 
 // signingPair is used for internal mapping of signing/verifying functions.
 type signingPair struct {
@@ -103,6 +103,9 @@ var (
 
 	// ErrNonExistantKey is returned when the provided key ID does not exist.
 	ErrNonExistantKey = errors.New("jwt: non-existant key")
+
+	// ErrUnsupportedKeyType is returned when the secret is not a supported type.
+	ErrUnsupportedKeyType = errors.New("jwt: unsupported key type")
 )
 
 // KeyLookupCallback is used by DecodeToken to look up the algorithm to decode with

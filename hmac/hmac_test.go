@@ -2,7 +2,7 @@ package hmac
 
 import "testing"
 
-var Secret = []byte("secret")
+var Secret = "secret"
 var Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19"
 
 var SignatureHS256 = "cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
@@ -16,6 +16,18 @@ func TestSignHS256(t *testing.T) {
 	}
 	if str != SignatureHS256 {
 		t.Fatalf("expected %#q, got %#q", SignatureHS256, str)
+	}
+}
+
+func TestSignHS256_ByteSlice(t *testing.T) {
+	if _, err := SignHS256(Token, []byte(Secret)); err != nil {
+		t.Fatalf("expected nil, got %#q", err)
+	}
+}
+
+func TestSignHS256_UnsupportedKeyType(t *testing.T) {
+	if _, err := SignHS256(Token, 0); err != ErrUnsupportedKeyType {
+		t.Fatalf("expected %#q, got %#q", ErrUnsupportedKeyType, err)
 	}
 }
 
