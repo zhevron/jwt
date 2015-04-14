@@ -41,7 +41,10 @@ func NewToken() *Token {
 // secret for verification. This function will only return an error if decoding
 // fails or the signature is invalid.
 //
-// Note: If you provide an Algirithm of "", the decoding will use the algorithm
+// The secret parameter type is variable. All algorithms support string
+// and []byte types, but some also have other custom types.
+//
+// Note: If you provide an Algorithm of "", the decoding will use the algorithm
 // provided by the token header. This is considered insecure and should not be
 // used in production. This functionality may be removed at a later point to
 // ensure that no users are unintentionally harming their applications.
@@ -201,6 +204,9 @@ func decodePayload(t *Token, s string) error {
 
 // Sign signs the token with the given secret and returns the base64 encoded
 // string value of the token.
+//
+// The secret parameter type is variable. All algorithms support string
+// and []byte types, but some also have other custom types.
 func (t Token) Sign(secret interface{}) (string, error) {
 	header, err := json.Marshal(t.buildHeader())
 	if err != nil {
