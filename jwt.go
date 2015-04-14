@@ -10,10 +10,10 @@ import (
 )
 
 // Signer is used by the signing packages to sign tokens.
-type Signer func(string, []byte) (string, error)
+type Signer func(string, interface{}) (string, error)
 
 // Verifier is used by the signing packages to verify signatures.
-type Verifier func(string, string, []byte) error
+type Verifier func(string, string, interface{}) error
 
 // signingPair is used for internal mapping of signing/verifying functions.
 type signingPair struct {

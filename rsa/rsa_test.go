@@ -2,7 +2,7 @@ package rsa
 
 import "testing"
 
-var PublicKey = []byte(`-----BEGIN PUBLIC KEY-----
+var PublicKey = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzshs12YDUivJD8MUdBTZ
 8wnzrWrLWxz0gAn03l72diG0yEzAsBH+s+mw293NJYGggWe2ueAE+5r252HNsKF7
 nACCm2FAk3kg+FOAQ0Fj7kxORRS8MSVK1eYBm1mIadpZs++ChgTbey/YJXaVPigD
@@ -10,8 +10,8 @@ eWcuxX1yLGxOeR44Sp0yIA50Qbko2i33Ruxjcl/HDi8uYFj1Vj1SmXKH+HPJ0qyS
 4YSJHyLP9545BMGUyhTNxYVam1rbKVlQH4S4A0rI9Yuqf/9O29UQ9DwWDUV0QXfC
 gjRSKGVHaA7XH6L/67292RzcCqtPg7ELac9W9YKwipVoNgbIi0Ny5HIkO1YMj5X+
 fQIDAQAB
------END PUBLIC KEY-----`)
-var PrivateKeyPKCS1 = []byte(`-----BEGIN RSA PRIVATE KEY-----
+-----END PUBLIC KEY-----`
+var PrivateKeyPKCS1 = `-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEAzshs12YDUivJD8MUdBTZ8wnzrWrLWxz0gAn03l72diG0yEzA
 sBH+s+mw293NJYGggWe2ueAE+5r252HNsKF7nACCm2FAk3kg+FOAQ0Fj7kxORRS8
 MSVK1eYBm1mIadpZs++ChgTbey/YJXaVPigDeWcuxX1yLGxOeR44Sp0yIA50Qbko
@@ -37,8 +37,8 @@ jPWIpXUq/NYCqq0B3umTWLKGYBkd3RpqHmiJZX7OHVJoran0lWf3FDJc9102DPMD
 XDBJrQKBgFUuBFCVtpcCcxHj+K0Y6kPHJ2o2dT4MaxXceYf+11da3zSAEGEoTLQB
 SiO0CgJt2xqBflgqBkXvRJxxIsfkWVzj7iapCE/zJqRCN1ToajmPDVJ0t5avMGNo
 x+O0Outi+RobtHziZuyx3pPwVhnEZ2CGEV3EMv9HG75aWDLqRXoH
------END RSA PRIVATE KEY-----`)
-var PrivateKeyPKCS8 = []byte(`-----BEGIN PRIVATE KEY-----
+-----END RSA PRIVATE KEY-----`
+var PrivateKeyPKCS8 = `-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDOyGzXZgNSK8kP
 wxR0FNnzCfOtastbHPSACfTeXvZ2IbTITMCwEf6z6bDb3c0lgaCBZ7a54AT7mvbn
 Yc2woXucAIKbYUCTeSD4U4BDQWPuTE5FFLwxJUrV5gGbWYhp2lmz74KGBNt7L9gl
@@ -65,7 +65,7 @@ GmoeaIllfs4dUmitqfSVZ/cUMlz3XTYM8wNcMEmtAoGAVS4EUJW2lwJzEeP4rRjq
 Q8cnajZ1PgxrFdx5h/7XV1rfNIAQYShMtAFKI7QKAm3bGoF+WCoGRe9EnHEix+RZ
 XOPuJqkIT/MmpEI3VOhqOY8NUnS3lq8wY2jH47Q662L5Ghu0fOJm7LHek/BWGcRn
 YIYRXcQy/0cbvlpYMupFegc=
------END PRIVATE KEY-----`)
+-----END PRIVATE KEY-----`
 var Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19"
 
 var SignatureRS256 = "YnK9-Nz5q-b7cKoVVpA6UPIieLj5XgU4cbyLYGNkYS0_60_9g-s8V0hbeqLXbfDiUBB5JD15zrU--fNbIlYzb_WKgluF6UEza6-dB51_mdFjdXrUmtNyzntidl1Q7GRzuXc6aKu4sbJJd7RA_pMLjDdiMZl2Gkmf2WrX-qoDPQ0y-cRlrvU9G8UhSOFJe_OX07h7dPG9UU7xHbJ9ZY4HfC0zCVEnqSTldZplY31OpM_sg4S45tJKOIGSSPULMRc0WFli_SycqWJA44fakZvLQzcxpcuhMj3qYoSKaNvtILfH2vhG63qreo-9loR7vKQ96S1tQfEq6SrD2kBYkF-E8g=="
@@ -81,6 +81,18 @@ func TestSignRS256(t *testing.T) {
 func TestSignRS256_PKCS8(t *testing.T) {
 	if _, err := SignRS256(Token, PrivateKeyPKCS8); err != nil {
 		t.Fatalf("expected nil, got %#q", err)
+	}
+}
+
+func TestSignRS256_ByteSlice(t *testing.T) {
+	if _, err := SignRS256(Token, []byte(PrivateKeyPKCS1)); err != nil {
+		t.Fatalf("expected nil, got %#q", err)
+	}
+}
+
+func TestSignRS256_UnsupportedKeyType(t *testing.T) {
+	if _, err := SignRS256(Token, 0); err != ErrUnsupportedKeyType {
+		t.Fatalf("expected %#q, got %#q", ErrUnsupportedKeyType, err)
 	}
 }
 
