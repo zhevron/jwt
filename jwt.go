@@ -105,9 +105,9 @@ var (
 	ErrNonExistantKey = errors.New("jwt: non-existant key")
 )
 
-// KeyLookupCallback is used by DecodeToken to look up the algorithm to decode with
+// keyLookupCallback is used by DecodeToken to look up the algorithm to decode with
 // if the "kid" header is specified in the token.
-var KeyLookupCallback func(string) Algorithm
+var keyLookupCallback func(string) (Algorithm, interface{})
 
 // supportedTypes is used to determine if a token type is supported.
 var supportedTypes = map[Type]bool{
@@ -137,4 +137,17 @@ var reservedClaims = map[string]bool{
 	"nbf": true,
 	"iat": true,
 	"jti": true,
+}
+
+// KeyLookupCallback sets the callback function to look up the algorithm and
+// secret to use for a given "kid" header (located in the token header).
+//
+// The function is expected to return the algorithm and secret, but the secret
+// can be omitted (by setting it to "" or nil). The callback will then use the
+// provided algorithm with the secret provided to the DecodeToken function.
+//
+// If the callback returns "" for the Algorithm, the subsequent token validation
+// will fail with ErrNonExistantKey.
+func KeyLookupCallback(callback func(string) (Algorithm, interface{})) {
+	keyLookupCallback = callback
 }

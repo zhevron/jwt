@@ -68,14 +68,20 @@ func DecodeToken(token string, algorithm Algorithm, secret interface{}) (*Token,
 		algorithm = t.Algorithm
 	}
 
-	if KeyLookupCallback != nil {
+	if keyLookupCallback != nil {
 		if len(t.KeyID) == 0 {
 			return nil, ErrNoKeyProvided
 		}
 
-		algorithm = KeyLookupCallback(t.KeyID)
+		var key interface{}
+		algorithm, key = keyLookupCallback(t.KeyID)
 		if len(string(algorithm)) == 0 {
 			return nil, ErrNonExistantKey
+		}
+		if key != nil {
+			if _, ok := key.(string); !ok || (ok && len(key.(string)) > 0) {
+				secret = key
+			}
 		}
 	}
 

@@ -110,14 +110,14 @@ func TestDecodeToken_FailManualAlgorithm(t *testing.T) {
 
 func TestDecodeToken_KeyLookup(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik15S2V5IiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.QyceulrMdZq-GGto_6YqxgooRs4FNxVIjLaYm1eBoXs="
-	KeyLookupCallback = func(kid string) Algorithm {
+	KeyLookupCallback(func(kid string) (Algorithm, interface{}) {
 		if kid == "MyKey" {
-			return HS256
+			return HS256, nil
 		}
-		return ""
-	}
+		return "", nil
+	})
 	_, err := DecodeToken(str, None, []byte("secret"))
-	KeyLookupCallback = nil
+	KeyLookupCallback(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,14 +125,14 @@ func TestDecodeToken_KeyLookup(t *testing.T) {
 
 func TestDecodeToken_NoKeyProvided(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
-	KeyLookupCallback = func(kid string) Algorithm {
+	KeyLookupCallback(func(kid string) (Algorithm, interface{}) {
 		if kid == "MyKey" {
-			return HS256
+			return HS256, nil
 		}
-		return ""
-	}
+		return "", nil
+	})
 	_, err := DecodeToken(str, None, []byte("secret"))
-	KeyLookupCallback = nil
+	KeyLookupCallback(nil)
 	if err != ErrNoKeyProvided {
 		t.Fatalf("expected %#q, got %#q", ErrNoKeyProvided, err)
 	}
@@ -140,14 +140,14 @@ func TestDecodeToken_NoKeyProvided(t *testing.T) {
 
 func TestDecodeToken_NonExistantKey(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik15S2V5IiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.QyceulrMdZq-GGto_6YqxgooRs4FNxVIjLaYm1eBoXs="
-	KeyLookupCallback = func(kid string) Algorithm {
+	KeyLookupCallback(func(kid string) (Algorithm, interface{}) {
 		if kid == "MyOtherKey" {
-			return HS256
+			return HS256, nil
 		}
-		return ""
-	}
+		return "", nil
+	})
 	_, err := DecodeToken(str, None, []byte("secret"))
-	KeyLookupCallback = nil
+	KeyLookupCallback(nil)
 	if err != ErrNonExistantKey {
 		t.Fatalf("expected %#q, got %#q", ErrNonExistantKey, err)
 	}

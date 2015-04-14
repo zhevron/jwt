@@ -23,13 +23,13 @@ func ExampleToken_decode() {
 func ExampleToken_kid() {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik15S2V5In0.eyJpc3MiOiJNeUlzc3VlciIsInNjb3BlcyI6WyJteV9zY29wZSJdfQ.blumu_NqfxUpTLAM48lAusGjJx5Mfyv_bRiRDWfPM9A"
 
-	KeyLookupCallback = func(kid string) Algorithm {
+	KeyLookupCallback(func(kid string) (Algorithm, interface{}) {
 		if kid == "MyKey" {
-			return HS256
+			return HS256, nil
 		}
 
-		return ""
-	}
+		return "", nil
+	})
 
 	secret := []byte("secret")
 	token, err := DecodeToken(str, None, secret)
