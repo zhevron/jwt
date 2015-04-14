@@ -19,6 +19,105 @@ go get gopkg.in/zhevron/jwt.v1
 
 **Note:** This package requires Go 1.3 or higher.
 
+## Examples
+
+### JSON Web Token (HMAC, HS256)
+```go
+import (
+  "fmt"
+
+  "gopkg.in/zhevron/jwt.v1"
+)
+
+func main() {
+  key := "secret"
+
+  token := jwt.NewToken()
+  token.Algorithm = jwt.HS256
+  token.Claims["username"] = "my_username"
+
+  tokenstring, err := token.Sign(key)
+  if err != nil {
+    panic(err)
+  }
+
+  token, err = jwt.DecodeToken(tokenstring, jwt.HS256, key)
+  if err != nil {
+    panic(err)
+  }
+
+  fmt.Printf("Your username is: %s\n", token.Claims["username"])
+}
+```
+
+### JSON Web Token (RSA, RS256)
+```go
+import (
+  "fmt"
+
+  "gopkg.in/zhevron/jwt.v1"
+)
+
+func main() {
+  privateKey = `-----BEGIN RSA PRIVATE KEY-----
+myprivatekeyhere
+-----END RSA PRIVATE KEY-----`
+  publicKey = `-----BEGIN PUBLIC KEY-----
+mypublickeyhere  
+-----END PUBLIC KEY-----`
+
+  token := jwt.NewToken()
+  token.Algorithm = jwt.RS256
+  token.Claims["username"] = "my_username"
+
+  tokenstring, err := token.Sign(privateKey)
+  if err != nil {
+    panic(err)
+  }
+
+  token, err = jwt.DecodeToken(tokenstring, jwt.RS256, publicKey)
+  if err != nil {
+    panic(err)
+  }
+
+  fmt.Printf("Your username is: %s\n", token.Claims["username"])
+}
+```
+
+### JSON Web Token (ECDSA, ES256)
+```go
+import (
+  "fmt"
+
+  "gopkg.in/zhevron/jwt.v1"
+)
+
+func main() {
+  privateKey = `-----BEGIN EC PRIVATE KEY-----
+myprivatekeyhere
+-----END EC PRIVATE KEY-----`
+  publicKey = `-----BEGIN PUBLIC KEY-----
+mypublickeyhere  
+-----END PUBLIC KEY-----`
+
+  token := jwt.NewToken()
+  token.Algorithm = jwt.ES256
+  token.Claims["username"] = "my_username"
+
+  tokenstring, err := token.Sign(privateKey)
+  if err != nil {
+    panic(err)
+  }
+
+  token, err = jwt.DecodeToken(tokenstring, jwt.ES256, publicKey)
+  if err != nil {
+    panic(err)
+  }
+
+  fmt.Printf("Your username is: %s\n", token.Claims["username"])
+}
+```
+
 ## License
 
 **jwt** is licensed under the [MIT license](http://opensource.org/licenses/MIT).
