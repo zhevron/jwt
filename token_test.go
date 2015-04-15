@@ -16,7 +16,7 @@ func TestNewToken(t *testing.T) {
 
 func TestDecodeToken(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
-	tkn, err := DecodeToken(str, HS256, []byte("secret"))
+	tkn, err := DecodeToken(str, HS256, "secret")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestDecodeToken_NoneAlgorithm(t *testing.T) {
 
 func TestDecodeToken_InvalidToken(t *testing.T) {
 	str := "abc123def456"
-	_, err := DecodeToken(str, HS256, []byte("secret"))
+	_, err := DecodeToken(str, HS256, "secret")
 	if err != ErrInvalidToken {
 		t.Fatalf("expected %#q, got %#q", ErrInvalidToken, err)
 	}
@@ -46,7 +46,7 @@ func TestDecodeToken_InvalidToken(t *testing.T) {
 
 func TestDecodeToken_InvalidHeader(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJX.eyJpYXQiOjE0MjQ3NzYzMDcsIm5iZiI6MTQyNDc3NjMwNiwiZXhwIjoxNDI0Nzc2MzA4LCJpc3MiOiJNeUlzc3VlciIsInN1YiI6Ik15U3ViamVjdCIsImF1ZCI6Ik15QXVkaWVuY2UiLCJzY29wZXMiOlsibXlfc2NvcGUiXX0=."
-	_, err := DecodeToken(str, HS256, []byte("secret"))
+	_, err := DecodeToken(str, HS256, "secret")
 	if err == nil {
 		t.Fatal("expected non nil, got nil")
 	}
@@ -54,7 +54,7 @@ func TestDecodeToken_InvalidHeader(t *testing.T) {
 
 func TestDecodeToken_InvalidPayload(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsIm5iZiI6MTQyNDc3NjMwNiwiZXhwIjoxNDI0Nzc2MzA4LCJpc3MiOiJNeUlzc3VlciIsInN1YiI6Ik15U3ViamVjdCIsImF1ZCI6Ik15QXVkaWVuY2UiLCJzY29wZXMiOlsibXlfc2NvcGUiXX0X."
-	_, err := DecodeToken(str, HS256, []byte("secret"))
+	_, err := DecodeToken(str, HS256, "secret")
 	if err == nil {
 		t.Fatal("expected non nil, got nil")
 	}
@@ -78,7 +78,7 @@ func TestDecodeToken_UnsupportedTokenType(t *testing.T) {
 
 func TestDecodeToken_UnsupportedAlgorithm(t *testing.T) {
 	str := "eyJhbGciOiJJTlZBTElEIiwidHlwIjoiSldUIn0=.eyJleHAiOjE0MjQ3NzY0NzAsImlhdCI6MTQyNDc3NjMwNywiaXNzIjoiTXlJc3N1ZXIiLCJzY29wZXMiOlsibXlfc2NvcGUiXX0=.zs_EW5i5gSmI660LlklPhtm8oH8ltf-vZMI3TDaOFH4="
-	_, err := DecodeToken(str, "NonExisting", []byte("secret"))
+	_, err := DecodeToken(str, "NonExisting", "secret")
 	if err != ErrUnsupportedAlgorithm {
 		t.Fatalf("expected %#q, got %#q", ErrUnsupportedAlgorithm, err)
 	}
@@ -86,7 +86,7 @@ func TestDecodeToken_UnsupportedAlgorithm(t *testing.T) {
 
 func TestDecodeToken_FailNoneWithSecret(t *testing.T) {
 	str := "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19."
-	_, err := DecodeToken(str, None, []byte("secret"))
+	_, err := DecodeToken(str, None, "secret")
 	if err != ErrNoneAlgorithmWithSecret {
 		t.Fatalf("expected %#q, got %#q", ErrNoneAlgorithmWithSecret, err)
 	}
@@ -94,7 +94,7 @@ func TestDecodeToken_FailNoneWithSecret(t *testing.T) {
 
 func TestDecodeToken_IncorrectAlgorithm(t *testing.T) {
 	str := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE0MjQ3NzYzMDcsImlzcyI6Ik15SXNzdWVyIiwic2NvcGVzIjpbIm15X3Njb3BlIl19.cMrSIdfeoGxOtgoZcNufWR2DGFP-qncUOdfrGCPJLZY="
-	_, err := DecodeToken(str, HS512, []byte("secret"))
+	_, err := DecodeToken(str, HS512, "secret")
 	if err != hmac.ErrVerifyFailed {
 		t.Fatalf("expected %#q, got %#q", hmac.ErrVerifyFailed, err)
 	}
@@ -108,7 +108,7 @@ func TestDecodeToken_KeyLookup(t *testing.T) {
 		}
 		return "", nil
 	})
-	_, err := DecodeToken(str, None, []byte("secret"))
+	_, err := DecodeToken(str, None, "secret")
 	KeyLookupCallback(nil)
 	if err != nil {
 		t.Fatal(err)
@@ -123,7 +123,7 @@ func TestDecodeToken_NoKeyProvided(t *testing.T) {
 		}
 		return "", nil
 	})
-	_, err := DecodeToken(str, None, []byte("secret"))
+	_, err := DecodeToken(str, None, "secret")
 	KeyLookupCallback(nil)
 	if err != ErrNoKeyProvided {
 		t.Fatalf("expected %#q, got %#q", ErrNoKeyProvided, err)
@@ -138,7 +138,7 @@ func TestDecodeToken_NonExistantKey(t *testing.T) {
 		}
 		return "", nil
 	})
-	_, err := DecodeToken(str, None, []byte("secret"))
+	_, err := DecodeToken(str, None, "secret")
 	KeyLookupCallback(nil)
 	if err != ErrNonExistantKey {
 		t.Fatalf("expected %#q, got %#q", ErrNonExistantKey, err)
@@ -298,7 +298,7 @@ func TestTokenSign(t *testing.T) {
 	tkn.NotBefore = time.Unix(1424776307, 0)
 	tkn.Expires = time.Unix(1424776307, 0)
 	tkn.Claims["scopes"] = []string{"my_scope"}
-	s, err := tkn.Sign([]byte("secret"))
+	s, err := tkn.Sign("secret")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -316,7 +316,7 @@ func TestTokenSign_NoneAlgorithm(t *testing.T) {
 	tkn.NotBefore = time.Unix(1424776307, 0)
 	tkn.Expires = time.Unix(1424776307, 0)
 	tkn.Claims["scopes"] = []string{"my_scope"}
-	s, err := tkn.Sign([]byte("secret"))
+	s, err := tkn.Sign("secret")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -328,7 +328,7 @@ func TestTokenSign_NoneAlgorithm(t *testing.T) {
 func TestTokenSign_InvalidClaims(t *testing.T) {
 	tkn := NewToken()
 	tkn.Claims["iss"] = 1
-	_, err := tkn.Sign([]byte("secret"))
+	_, err := tkn.Sign("secret")
 	if err == nil {
 		t.Fatalf("expected non nil, got nil")
 	}
@@ -339,7 +339,7 @@ func TestTokenSign_InvalidPayload(t *testing.T) {
 	tkn.Claims["scopes"] = map[int]string{
 		0: "test",
 	}
-	_, err := tkn.Sign([]byte("secret"))
+	_, err := tkn.Sign("secret")
 	if err == nil {
 		t.Fatalf("expected non nil, got nil")
 	}
@@ -348,7 +348,7 @@ func TestTokenSign_InvalidPayload(t *testing.T) {
 func TestTokenSign_UnsupportedAlgorithm(t *testing.T) {
 	tkn := NewToken()
 	tkn.Algorithm = Algorithm("INVALID")
-	_, err := tkn.Sign([]byte("secret"))
+	_, err := tkn.Sign("secret")
 	if err != ErrUnsupportedAlgorithm {
 		t.Fatalf("expected %#q, got %#q", ErrUnsupportedAlgorithm, err)
 	}
