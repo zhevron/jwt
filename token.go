@@ -44,10 +44,8 @@ func NewToken() *Token {
 // The secret parameter type is variable. All algorithms support string
 // and []byte types, but some also have other custom types.
 //
-// Note: If you provide an Algorithm of "", the decoding will use the algorithm
-// provided by the token header. This is considered insecure and should not be
-// used in production. This functionality may be removed at a later point to
-// ensure that no users are unintentionally harming their applications.
+// Note: The "alg" field of the token header is completely ignored in order
+// to ensure that a token is what the server expects.
 func DecodeToken(token string, algorithm Algorithm, secret interface{}) (*Token, error) {
 	s := strings.Split(token, ".")
 	if len(s) != 3 {
@@ -62,10 +60,6 @@ func DecodeToken(token string, algorithm Algorithm, secret interface{}) (*Token,
 
 	if err := decodePayload(t, s[1]); err != nil {
 		return nil, err
-	}
-
-	if len(string(algorithm)) == 0 {
-		algorithm = t.Algorithm
 	}
 
 	if keyLookupCallback != nil {
