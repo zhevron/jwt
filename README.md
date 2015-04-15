@@ -33,7 +33,6 @@ func main() {
   key := "secret"
 
   token := jwt.NewToken()
-  token.Algorithm = jwt.HS256
   token.Claims["username"] = "my_username"
 
   tokenstring, err := token.Sign(key)
