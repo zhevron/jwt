@@ -198,11 +198,12 @@ func decodePayload(t *Token, s string) error {
 	return nil
 }
 
-// Sign signs the token with the given secret and returns the base64 encoded
+// Sign signs the token with the provided secret and returns the base64 encoded
 // string value of the token.
 //
 // The secret parameter type is variable. All algorithms support string
 // and []byte types, but some also have other custom types.
+// Refer to the documentation in each encryption package for the options.
 func (t Token) Sign(secret interface{}) (string, error) {
 	header, err := json.Marshal(t.buildHeader())
 	if err != nil {

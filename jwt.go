@@ -10,9 +10,11 @@ import (
 )
 
 // Signer is used by the signing packages to sign tokens.
+// You can use this type to implement your own signing and verification.
 type Signer func(string, interface{}) (string, error)
 
 // Verifier is used by the signing packages to verify signatures.
+// You can use this type to implement your own signing and verification.
 type Verifier func(string, string, interface{}) error
 
 // signingPair is used for internal mapping of signing/verifying functions.
@@ -29,7 +31,7 @@ const (
 	JWT Type = "JWT"
 )
 
-// Algorithm is used to define the hashing algorithm used for the token.
+// Algorithm is used to define the encryption algorithm used for the token.
 type Algorithm string
 
 const (
@@ -54,13 +56,13 @@ const (
 	// RS512 represents the RSA SHA-512 algorithm.
 	RS512 Algorithm = "RS512"
 
-	// ES256 represents the ECDSA P-256 SHA-256 algorithm.
+	// ES256 represents the ECDSA SHA-256 algorithm.
 	ES256 Algorithm = "ES256"
 
-	// ES384 represents the ECDSA P-384 SHA-384 algorithm.
+	// ES384 represents the ECDSA SHA-384 algorithm.
 	ES384 Algorithm = "ES384"
 
-	// ES512 represents the ECDSA P-512 SHA-512 algorithm.
+	// ES512 represents the ECDSA SHA-512 algorithm.
 	ES512 Algorithm = "ES512"
 )
 

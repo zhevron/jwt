@@ -19,7 +19,7 @@ var (
 	ErrUnsupportedKeyType = errors.New("jwt/rsa: unsupported key type")
 )
 
-// SignRS256 signs the given token with the given secret using HMAC SHA-256.
+// SignRS256 signs a token with the provided secret using RSA SHA-256.
 func SignRS256(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -29,7 +29,7 @@ func SignRS256(token string, secret interface{}) (string, error) {
 	return computeHash(token, crypto.SHA256, k)
 }
 
-// SignRS384 signs the given token with the given secret using HMAC SHA-384.
+// SignRS384 signs a token with the provided secret using RSA SHA-384.
 func SignRS384(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -39,7 +39,7 @@ func SignRS384(token string, secret interface{}) (string, error) {
 	return computeHash(token, crypto.SHA384, k)
 }
 
-// SignRS512 signs the given token with the given secret using HMAC SHA-512.
+// SignRS512 signs a token with the provided secret using RSA SHA-512.
 func SignRS512(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -79,7 +79,7 @@ func VerifyRS512(token, signature string, secret interface{}) error {
 	return verifySignature(token, signature, crypto.SHA512, k)
 }
 
-// computeHash calculates the hash for the token with the given algorithm.
+// computeHash calculates the hash for a token using the provided algorithm..
 func computeHash(tkn string, h crypto.Hash, k *rsa.PrivateKey) (string, error) {
 	hash := h.New()
 	hash.Write([]byte(tkn))

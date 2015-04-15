@@ -26,7 +26,7 @@ var (
 	ErrUnsupportedKeyType = errors.New("jwt/ecdsa: unsupported key type")
 )
 
-// SignES256 signs the given token with the given secret using ECDSA SHA-256.
+// SignES256 signs a token with the provided secret using ECDSA SHA-256.
 func SignES256(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -36,7 +36,7 @@ func SignES256(token string, secret interface{}) (string, error) {
 	return computeHash(token, crypto.SHA256, k)
 }
 
-// SignES384 signs the given token with the given secret using ECDSA SHA-384.
+// SignES384 signs a token with the provided secret using ECDSA SHA-384.
 func SignES384(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -46,7 +46,7 @@ func SignES384(token string, secret interface{}) (string, error) {
 	return computeHash(token, crypto.SHA384, k)
 }
 
-// SignES512 signs the given token with the given secret using ECDSA SHA-512.
+// SignES512 signs a token with the provided secret using ECDSA SHA-512.
 func SignES512(token string, secret interface{}) (string, error) {
 	k, err := privateKey(secret)
 	if err != nil {
@@ -86,7 +86,7 @@ func VerifyES512(token, signature string, secret interface{}) error {
 	return verifySignature(token, signature, crypto.SHA512, k)
 }
 
-// computeHash calculates the hash for the token with the given algorithm.
+// computeHash calculates the hash for a token using the provided algorithm.
 func computeHash(tkn string, h crypto.Hash, k *ecdsa.PrivateKey) (string, error) {
 	hash := h.New()
 	hash.Write([]byte(tkn))

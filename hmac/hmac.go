@@ -18,7 +18,7 @@ var (
 	ErrUnsupportedKeyType = errors.New("jwt/hmac: unsupported key type")
 )
 
-// SignHS256 signs the given token with the given secret using HMAC SHA-256.
+// SignHS256 signs a token with the provided secret using HMAC SHA-256.
 func SignHS256(token string, secret interface{}) (string, error) {
 	s, err := checkSecret(secret)
 	if err != nil {
@@ -28,7 +28,7 @@ func SignHS256(token string, secret interface{}) (string, error) {
 	return computeHash(token, hmac.New(sha256.New, s))
 }
 
-// SignHS384 signs the given token with the given secret using HMAC SHA-384.
+// SignHS384 signs a token with the provided secret using HMAC SHA-384.
 func SignHS384(token string, secret interface{}) (string, error) {
 	s, err := checkSecret(secret)
 	if err != nil {
@@ -38,7 +38,7 @@ func SignHS384(token string, secret interface{}) (string, error) {
 	return computeHash(token, hmac.New(sha512.New384, s))
 }
 
-// SignHS512 signs the given token with the given secret using HMAC SHA-512.
+// SignHS512 signs a token with the provided secret using HMAC SHA-512.
 func SignHS512(token string, secret interface{}) (string, error) {
 	s, err := checkSecret(secret)
 	if err != nil {
@@ -72,7 +72,7 @@ func VerifyHS512(token, signature string, secret interface{}) error {
 	return nil
 }
 
-// computeHash calculates the hash for the token with the given algorithm.
+// computeHash calculates the hash for a token using the provided algorithm.
 func computeHash(token string, h hash.Hash) (string, error) {
 	h.Write([]byte(token))
 	return base64.URLEncoding.EncodeToString(h.Sum(nil)), nil
