@@ -4,9 +4,9 @@ package jwt
 import (
 	"errors"
 
-	"github.com/zhevron/jwt/ecdsa"
-	"github.com/zhevron/jwt/hmac"
-	"github.com/zhevron/jwt/rsa"
+	"gopkg.in/zhevron/jwt.v0/ecdsa"
+	"gopkg.in/zhevron/jwt.v0/hmac"
+	"gopkg.in/zhevron/jwt.v0/rsa"
 )
 
 // Signer is used by the signing packages to sign tokens.
